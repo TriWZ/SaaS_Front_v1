@@ -12,7 +12,7 @@ password = st.sidebar.text_input("Password", type="password")
 token = None
 
 if st.sidebar.button("Login"):
-    res = requests.post("http://localhost:8000/auth/login", json={"email": email, "password": password})
+    res = requests.post("https://saas-back-v1.onrender.com/auth/login", json={"email": email, "password": password})
     if res.status_code == 200:
         token = res.json()["access_token"]
         st.session_state["token"] = token
@@ -24,7 +24,7 @@ if "token" in st.session_state:
     st.success("Authenticated. You can now query building data.")
     headers = {"Authorization": f"Bearer {st.session_state['token']}"}
     user_id = 1  # hardcoded for demo; should decode from token
-    res = requests.get(f"http://localhost:8000/buildings/list/{user_id}")
+    res = requests.get(f"https://saas-back-v1.onrender.com/buildings/list/{user_id}")
     buildings = res.json()
     building_names = [b['name'] for b in buildings]
     building_ids = [b['id'] for b in buildings]
@@ -32,7 +32,7 @@ if "token" in st.session_state:
     b_id = building_ids[building_names.index(selected)]
 
     st.subheader("📊 Energy KPI + Trends")
-    hist = requests.get(f"http://localhost:8000/energy/history/{b_id}").json()
+    hist = requests.get(f"https://saas-back-v1.onrender.com/energy/history/{b_id}").json()
     if hist:
         df = pd.DataFrame(hist)
         df['timestamp'] = pd.to_datetime(df['timestamp'])
@@ -67,7 +67,7 @@ if "token" in st.session_state:
                 "strategy_text": suggestion,
                 "accepted": accept
             }
-            r = requests.post("http://localhost:8000/feedback/add", json=payload)
+            r = requests.post("https://saas-back-v1.onrender.com/feedback/add", json=payload)
             if r.status_code == 200:
                 st.success("Feedback submitted.")
             else:
